@@ -1,0 +1,40 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: test-app
+spec:
+  replicas: 3
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  minReadySeconds: 5 
+  template:
+    metadata:
+      labels:
+        app: test-app
+    spec:
+      containers:
+      - name: test-app
+        image: isdevcontainerregistry.azurecr.io/test-app:v1
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            cpu: 250m
+          limits:
+            cpu: 500m
+        env:
+        - name: KWE
+          value: "just for reference"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: test-app
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 80
+  selector:
+    app: test-app
